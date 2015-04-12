@@ -7,7 +7,9 @@ var STATUS_CODES = http.STATUS_CODES;
  * Scraper Constructor
 **/
 function Scraper (url) {
+    this.index = 0;
     this.url = url;
+    this.urls = [];
     this.init();
 }
 /*
@@ -19,19 +21,46 @@ util.inherits(Scraper, EventEmitter);
  * Initialize scraping
 **/
 Scraper.prototype.init = function () {
-    var model;
     var self = this;
-    self.on('loaded', function (html) {
-        model = self.parsePilotPage(html);
-        self.emit('complete', model);
+    self.models = [];
+
+    self.on('loadedPilotPage', function (html) {
+        self.urls = self.parseLeaguePage(html);
+        console.log("urls[index]: ", self.urls[this.index]);
+        self.url = 'http://www.xcleague.com' + self.urls[this.index];
+        self.loadPage('loadedFlightPage');
+        // self.emit('complete', model);
     });
 
-    self.loadPilotPage();
+    function loadNextFlight(){
+
+    }
+
+    self.on('loadedFlightPage', function (html) {
+        var nextUrl = self.parseFlightPage(html);
+        if(nextUrl !== undefined && nextUrl !== 'undefined'){
+          console.log("loadedFlightPage: ", nextUrl);
+          self.url = 'http://www.xcleague.com' + nextUrl;
+          self.loadPage('loadedFlightPage');
+          // self.emit('complete', model);
+        }else{
+          if(this.index < self.urls.length - 1){
+            this.index ++;
+            self.url = 'http://www.xcleague.com' + self.urls[this.index];
+            console.log("index: ", self.url);
+            self.loadPage('loadedFlightPage');
+          }else{
+            self.emit('complete', self.models);
+          }
+        }
+    });
+
+    self.loadPage('loadedPilotPage');
 };
 
-Scraper.prototype.loadPilotPage = function () {
+Scraper.prototype.loadPage = function (eventName) {
   var self = this;
-  console.log('\n\nLoading pilot ');
+  console.log('\n\nLoading: ', self.url);
   http.get(self.url, function (res) {
     var body = '';
     if(res.statusCode !== 200) {
@@ -41,7 +70,7 @@ Scraper.prototype.loadPilotPage = function () {
       body += chunk;
     });
     res.on('end', function () {
-      self.emit('loaded', body);
+      self.emit(eventName, body);
     });
   })
   .on('error', function (err) {
@@ -52,48 +81,125 @@ Scraper.prototype.loadPilotPage = function () {
 /*
  * Parse html and return an object
 **/
-Scraper.prototype.parsePilotPage = function (html) {
+Scraper.prototype.parseLeaguePage = function (html) {
   var $ = cheerio.load(html);
-  var models = [];
   var table = $('#leagueTable');
-
-  var rows = table.find('tr');
-  console.log(rows.length);
+  var rows = table.find('tr').eq(1);
+  var flights = [];
 
   rows.each(function(index, el){
   	var row = $(el);
   	var tds = row.find('td');
-  	var pilot = tds.eq(1).text();
-  	var club = tds.eq(2).text();
-  	var glider = tds.eq(3).text();
-  	var total = tds.eq(4).text();
-  	var flight1 = tds.eq(6).find('a').eq('1').attr('href');
-  	var flight2 = tds.eq(7).find('a').eq('1').attr('href');
-  	var flight3 = tds.eq(8).find('a').eq('1').attr('href');
-  	var flight4 = tds.eq(9).find('a').eq('1').attr('href');
-  	var flight5 = tds.eq(10).find('a').eq('1').attr('href');
-  	var flight6 = tds.eq(11).find('a').eq('1').attr('href');
-  	var flights = [
-        flight1,
-  			flight2,
-  			flight3,
-  			flight4,
-  			flight5,
-  			flight6
-  		];
 
-  	var model = {
-  		pilot: pilot,
-  		club: club,
-  		glider: glider,
-  		total: total,
-  		flightUrls: flights
-  	};
-
-  	models.push(model);
-
+  	var flight = tds.eq(6).find('a').eq('1').attr('href');
+    if(flight !== undefined){
+      console.log("flight: ", flight);
+      flights.push(flight);
+    }
   });
-  return models;
+
+  return flights;
 };
+
+Scraper.prototype.parseFlightPage = function(html){
+  var self = this;
+  var $ = cheerio.load(html);
+
+  $('#coordinates').remove();
+
+  var pilot = $('#hpTitle').html().replace(/\n|<span.*<\/span>/gi, "");
+  var title = $('.vfFlightText').text();
+
+  var club, glider, date, start, finish, duration, takeoff, landing, total, multiplier, score;
+  // var club = $('.viewRow .viewText').eq(0).text();
+  // var glider = $('.viewRow .viewText').eq(1).text();
+  // var date = $('.viewRow .viewText').eq(2).text();
+  // var start = $('.viewRow .viewText').eq(3).text();
+  // var finish = $('.viewRow .viewText').eq(4).text();
+  // var duration = $('.viewRow .viewText').eq(5).text();
+  // var takeoff = $('.viewRow .viewText').eq(6).text();
+  // var landing = $('.viewRow .viewText').eq(7).text();
+
+  $('.viewRow').each(function(index, el){
+    var $el = $(el);
+    var label = $el.find('.viewLabel').text();
+    var text = $el.find('.viewText').text();
+
+    switch(label){
+      case 'Club':
+        club = text;
+      break;
+
+      case 'Glider':
+        glider = text;
+      break;
+
+      case 'Date':
+        date = text;
+      break;
+
+      case 'Start':
+        start = text;
+      break;
+
+      case 'Finish':
+        finish = text;
+      break;
+
+      case 'Duration':
+        duration = text;
+      break;
+
+      case 'Takeoff':
+        takeoff = text;
+      break;
+
+      case 'Landing':
+        landing = text;
+      break;
+
+      case 'Total':
+        total = text;
+      break;
+
+      case 'Multiplier':
+        multiplier = text;
+      break;
+
+      case 'Score':
+        score = text;
+      break;
+    }
+  })
+  // var distance = $('.viewRow').eq(8).text();
+  // var total = $('.viewRow').eq(9).text();
+  // var multiplier = $('.viewRow').eq(10).text();
+  // var score = $('.viewRow').eq(11).text();
+  var model = {
+    pilot: pilot,
+    title: title,
+    club: club,
+    glider: glider,
+    date: date,
+    start: start,
+    finish: finish,
+    duration: duration,
+    takeoff: takeoff,
+    landing: landing,
+    total: total,
+    multiplier: multiplier,
+    score: score
+  }
+
+  self.models.push(model);
+
+  var nextUrl = $('.navNext a').attr('href');
+  if(nextUrl !== 'undefined' && nextUrl !== undefined){
+    console.log("nextUrl: ", nextUrl);
+    return nextUrl;
+  }else{
+    console.log("no more urls");
+  }
+}
 
 module.exports = Scraper;

@@ -2,10 +2,10 @@ var Model = require('./model');
 var Scraper = require('./scraper');
 var Pages = [];
 var domain = 'http://www.xcleague.com';
-var savedModels = [];
+var flightUrls = [];
 
 function generateUrls(limit) {
-  var url = domain + '/xc/leagues/all-1.html';
+  var url = domain + '/xc/leagues/2005-1.html';
   var urls= [url];
 
   return urls;
@@ -32,15 +32,16 @@ function scrapePilots() {
   // if the request completed successfully
   // we want to store the results in our database
   scraper.on('complete', function (models) {
+    
     for (var i = 0; i < models.length; i++) {
       model = new Model(models[i]);
-      savedModels.push(model);
       model.save(function(err) {
         if (err) {
           console.log('Database err saving: ' + url);
         }
       });
     };
+    console.log("all models saved to MongoDB");
 
   });
 }
