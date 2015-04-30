@@ -1,5 +1,6 @@
 var http = require('http');
 var cheerio = require('cheerio');
+var moment = require('moment');
 var util = require('util');
 var EventEmitter = require('events').EventEmitter;
 var STATUS_CODES = http.STATUS_CODES;
@@ -29,12 +30,7 @@ Scraper.prototype.init = function () {
         console.log("urls[index]: ", self.urls[this.index]);
         self.url = 'http://www.xcleague.com' + self.urls[this.index];
         self.loadPage('loadedFlightPage');
-        // self.emit('complete', model);
     });
-
-    function loadNextFlight(){
-
-    }
 
     self.on('loadedFlightPage', function (html) {
         var nextUrl = self.parseFlightPage(html);
@@ -42,7 +38,6 @@ Scraper.prototype.init = function () {
           console.log("loadedFlightPage: ", nextUrl);
           self.url = 'http://www.xcleague.com' + nextUrl;
           self.loadPage('loadedFlightPage');
-          // self.emit('complete', model);
         }else{
           if(this.index < self.urls.length - 1){
             this.index ++;
@@ -57,6 +52,10 @@ Scraper.prototype.init = function () {
 
     self.loadPage('loadedPilotPage');
 };
+
+Scraper.prototype.resume = function() {
+  this.emit('loadedFlightPage');
+}
 
 Scraper.prototype.loadPage = function (eventName) {
   var self = this;
@@ -84,14 +83,19 @@ Scraper.prototype.loadPage = function (eventName) {
 Scraper.prototype.parseLeaguePage = function (html) {
   var $ = cheerio.load(html);
   var table = $('#leagueTable');
-  var rows = table.find('tr').eq(1);
+
+  // for testing use one entry
+  // var rows = table.find('tr').eq(50);
+
+  // production use all entries
+  var rows = table.find('tr');
   var flights = [];
 
   rows.each(function(index, el){
   	var row = $(el);
   	var tds = row.find('td');
-
-  	var flight = tds.eq(6).find('a').eq('1').attr('href');
+    var flight = tds.eq(6).find('a').eq('1').attr('href');
+    
     if(flight !== undefined){
       console.log("flight: ", flight);
       flights.push(flight);
@@ -102,6 +106,11 @@ Scraper.prototype.parseLeaguePage = function (html) {
 };
 
 Scraper.prototype.parseFlightPage = function(html){
+  if(html === undefined){
+    console.log("return")
+    return undefined;
+  }
+  console.log("call to parse")
   var self = this;
   var $ = cheerio.load(html);
 
@@ -111,14 +120,6 @@ Scraper.prototype.parseFlightPage = function(html){
   var title = $('.vfFlightText').text();
 
   var club, glider, date, start, finish, duration, takeoff, landing, total, multiplier, score;
-  // var club = $('.viewRow .viewText').eq(0).text();
-  // var glider = $('.viewRow .viewText').eq(1).text();
-  // var date = $('.viewRow .viewText').eq(2).text();
-  // var start = $('.viewRow .viewText').eq(3).text();
-  // var finish = $('.viewRow .viewText').eq(4).text();
-  // var duration = $('.viewRow .viewText').eq(5).text();
-  // var takeoff = $('.viewRow .viewText').eq(6).text();
-  // var landing = $('.viewRow .viewText').eq(7).text();
 
   $('.viewRow').each(function(index, el){
     var $el = $(el);
@@ -170,17 +171,25 @@ Scraper.prototype.parseFlightPage = function(html){
         score = text;
       break;
     }
-  })
-  // var distance = $('.viewRow').eq(8).text();
-  // var total = $('.viewRow').eq(9).text();
-  // var multiplier = $('.viewRow').eq(10).text();
-  // var score = $('.viewRow').eq(11).text();
+  });
+
+  // get stats from panel
+  var stats = $('#xcTab-stats-content');
+  var maxHeight = stats.find('#xcTab-stats-height-max').text();
+  var lowHeight = stats.find('#xcTab-stats-height-low').text();
+  var teakeoffHeight = stats.find('#xcTab-stats-height-ta').text();
+  var maxClimb = stats.find('#xcTab-stats-climb-max').text();
+  var minClimb = stats.find('#xcTab-stats-climb-min').text();
+  var maxSpeed = stats.find('#xcTab-stats-speed-max').text();
+  var avgSpeedCourse = stats.find('#xcTab-stats-speed-avgCourse').text();
+  var avgSpeedTrack = stats.find('#xcTab-stats-speed-avgCourse').text();
+
   var model = {
     pilot: pilot,
     title: title,
     club: club,
     glider: glider,
-    date: date,
+    date: moment(date, 'DD MMM YYYY'),
     start: start,
     finish: finish,
     duration: duration,
@@ -188,7 +197,15 @@ Scraper.prototype.parseFlightPage = function(html){
     landing: landing,
     total: total,
     multiplier: multiplier,
-    score: score
+    score: score,
+    maxHeight: maxHeight,
+    lowHeight: lowHeight,
+    takeoffHeight: teakeoffHeight,
+    maxClimb: maxClimb,
+    minClimb: minClimb,
+    maxSpeed: maxSpeed,
+    avgSpeedCourse: avgSpeedCourse,
+    avgSpeedTrack: avgSpeedTrack
   }
 
   self.models.push(model);

@@ -5,7 +5,9 @@ var domain = 'http://www.xcleague.com';
 var flightUrls = [];
 
 function generateUrls(limit) {
-  var url = domain + '/xc/leagues/2005-1.html';
+  // test url for errors
+  //http://www.xcleague.com/xc/flights/20142100.html?vx=0111
+  var url = domain + '/xc/leagues/all-1.html';
   var urls= [url];
 
   return urls;
@@ -26,8 +28,8 @@ function scrapePilots() {
   // if the error occurs we still want to create our
   // next request
   scraper.on('error', function (error) {
-    console.log(error);
-    scrapePilots();
+    console.log('bot error received from Scraper: ', error);
+    scraper.resume();
   });
   // if the request completed successfully
   // we want to store the results in our database
