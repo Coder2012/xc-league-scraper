@@ -6,6 +6,7 @@ mongoose.connection.on('error', function() {
 });
 
 var FlightSchema = new mongoose.Schema({
+	_id: String,
 	pilot: String,
 	title: String,
 	club: String,
@@ -28,5 +29,7 @@ var FlightSchema = new mongoose.Schema({
 	avgSpeedCourse: String,
 	avgSpeedTrack: String
 });
+
+
 
 module.exports = mongoose.model('flights', FlightSchema);

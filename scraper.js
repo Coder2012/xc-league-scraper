@@ -85,7 +85,7 @@ Scraper.prototype.parseLeaguePage = function (html) {
   var table = $('#leagueTable');
 
   // for testing use one entry
-  // var rows = table.find('tr').eq(50);
+  // var rows = table.find('tr').eq(605);
 
   // production use all entries
   var rows = table.find('tr');
@@ -94,7 +94,11 @@ Scraper.prototype.parseLeaguePage = function (html) {
   rows.each(function(index, el){
   	var row = $(el);
   	var tds = row.find('td');
-    var flight = tds.eq(6).find('a').eq('1').attr('href');
+    // latest entries
+    var flight = tds.eq(1).find('a').eq('1').attr('href');
+
+    // all entries
+    // var flight = tds.eq(6).find('a').eq('1').attr('href');
     
     if(flight !== undefined){
       console.log("flight: ", flight);
@@ -110,7 +114,6 @@ Scraper.prototype.parseFlightPage = function(html){
     console.log("return")
     return undefined;
   }
-  console.log("call to parse")
   var self = this;
   var $ = cheerio.load(html);
 
@@ -210,7 +213,8 @@ Scraper.prototype.parseFlightPage = function(html){
 
   self.models.push(model);
 
-  var nextUrl = $('.navNext a').attr('href');
+  // var nextUrl = $('.navNext a').attr('href');
+  var nextUrl = 'undefined';
   if(nextUrl !== 'undefined' && nextUrl !== undefined){
     console.log("nextUrl: ", nextUrl);
     return nextUrl;
