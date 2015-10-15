@@ -119,7 +119,8 @@ Scraper.prototype.parseFlightPage = function(html){
 
   $('#coordinates').remove();
 
-  var pilot = $('#hpTitle').html().replace(/\n|<span.*<\/span>/gi, "");
+  // var pilot = $('#hpTitle').html().replace(/\n|<span.*<\/span>/gi, "");
+  var pilot = $('.vfPilot').text();
   var title = $('.vfFlightText').text();
 
   var club, glider, date, start, finish, duration, takeoff, landing, total, multiplier, score;

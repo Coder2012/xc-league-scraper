@@ -30,6 +30,7 @@ var FlightSchema = new mongoose.Schema({
 	avgSpeedTrack: String
 });
 
-
-
-module.exports = mongoose.model('flights', FlightSchema);
+module.exports = {
+	flights: mongoose.model('flights', FlightSchema),
+	schema: FlightSchema
+}

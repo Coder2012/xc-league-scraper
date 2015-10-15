@@ -1,50 +1,17 @@
-//var Model = require('./model');
+var m = require('./model');
+var FlightModel = m.flights
+var schema = m.schema;
 var Scraper = require('./scraper');
 var Pages = [];
 var domain = 'http://www.xcleague.com';
 var flightUrls = [];
 
-var mongoose = require('mongoose');
-
-mongoose.connect('mongodb://localhost:27017/reactor');
-mongoose.connection.on('error', function() {
-  console.error('MongoDB Connection Error. Make sure MongoDB is running.');
-});
-
-var FlightSchema = new mongoose.Schema({
-  _id: String,
-  pilot: String,
-  title: String,
-  club: String,
-  glider: String,
-  date: Object,
-  start: String,
-  finish: String,
-  duration: String,
-  takeoff: String,
-  landing: String,
-  total: String,
-  multiplier: String,
-  score: String,
-  maxHeight: String,
-  lowHeight: String,
-  takeoffHeight: String,
-  maxClimb: String,
-  minClimb: String,
-  maxSpeed: String,
-  avgSpeedCourse: String,
-  avgSpeedTrack: String
-});
-
-
-
-var UserModel = mongoose.model('flights', FlightSchema);
-
-FlightSchema.pre('save', function(next){
+schema.pre('save', function(next){
   var id = this.pilot + this.start + this.finish;
   this._id = id.replace(/ /g, '');
+  console.log(this._id);
 
-    UserModel.find({_id : this._id}, function (err, docs) {
+    FlightModel.find({_id : this._id}, function (err, docs) {
         if (!docs.length){
             next();
         }else{                
@@ -90,7 +57,7 @@ function scrapePilots() {
   scraper.on('complete', function (models) {
     
     for (var i = 0; i < models.length; i++) {
-      model = new UserModel(models[i]);
+      model = new FlightModel(models[i]);
 
       var id = model.pilot + model.start + model.finish;
       id = id.replace(/ /g, '');
