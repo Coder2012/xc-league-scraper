@@ -37,6 +37,7 @@ function scrapePilots() {
     
     for (var i = 0; i < models.length; i++) {
       model = new Model(models[i]);
+      // console.log(models[i]);
       model.save(function(err) {
         if (err) {
           console.log('Database err saving: ' + url);
