@@ -85,7 +85,7 @@ Scraper.prototype.parseLeaguePage = function (html) {
   var table = $('#leagueTable');
 
   // for testing use one entry
-  // var rows = table.find('tr').eq(605);
+  // var rows = table.find('tr').eq(399);
 
   // production use all entries
   var rows = table.find('tr');
@@ -94,11 +94,7 @@ Scraper.prototype.parseLeaguePage = function (html) {
   rows.each(function(index, el){
   	var row = $(el);
   	var tds = row.find('td');
-    // latest entries
-    var flight = tds.eq(1).find('a').eq('1').attr('href');
-
-    // all entries
-    // var flight = tds.eq(6).find('a').eq('1').attr('href');
+    var flight = tds.eq(6).find('a').eq('1').attr('href');
     
     if(flight !== undefined){
       console.log("flight: ", flight);
@@ -114,16 +110,18 @@ Scraper.prototype.parseFlightPage = function(html){
     console.log("return")
     return undefined;
   }
+  console.log("call to parse")
   var self = this;
   var $ = cheerio.load(html);
 
   $('#coordinates').remove();
 
-  // var pilot = $('#hpTitle').html().replace(/\n|<span.*<\/span>/gi, "");
-  var pilot = $('.vfPilot').text();
+  var pilot = $('#hpTitle').html().replace(/\n|<span.*<\/span>/gi, "");
   var title = $('.vfFlightText').text();
 
-  var club, glider, date, start, finish, duration, takeoff, landing, total, multiplier, score;
+  var club = '', glider = '', date = '', start = '', finish = '', duration = '', takeoff = '', landing = '', total = '', multiplier = '', score = '';
+
+  var totalCollected = false;
 
   $('.viewRow').each(function(index, el){
     var $el = $(el);
@@ -164,7 +162,10 @@ Scraper.prototype.parseFlightPage = function(html){
       break;
 
       case 'Total':
-        total = text;
+        if(!totalCollected){
+          totalCollected = true;
+          total = text;
+        }
       break;
 
       case 'Multiplier':
@@ -174,6 +175,9 @@ Scraper.prototype.parseFlightPage = function(html){
       case 'Score':
         score = text;
       break;
+
+      default:
+        0;
     }
   });
 
@@ -181,41 +185,44 @@ Scraper.prototype.parseFlightPage = function(html){
   var stats = $('#xcTab-stats-content');
   var maxHeight = stats.find('#xcTab-stats-height-max').text();
   var lowHeight = stats.find('#xcTab-stats-height-low').text();
-  var teakeoffHeight = stats.find('#xcTab-stats-height-ta').text();
+  var takeoffHeight = stats.find('#xcTab-stats-height-ta').text();
   var maxClimb = stats.find('#xcTab-stats-climb-max').text();
   var minClimb = stats.find('#xcTab-stats-climb-min').text();
   var maxSpeed = stats.find('#xcTab-stats-speed-max').text();
   var avgSpeedCourse = stats.find('#xcTab-stats-speed-avgCourse').text();
-  var avgSpeedTrack = stats.find('#xcTab-stats-speed-avgCourse').text();
+  var avgSpeedTrack = stats.find('#xcTab-stats-speed-avgCourse').text();pilot
 
   var model = {
+    identifier: pilot + start + finish + score,
     pilot: pilot,
     title: title,
     club: club,
     glider: glider,
     date: moment(date, 'DD MMM YYYY'),
     start: start,
+    startNum: parseFloat(start || 0),
     finish: finish,
+    finishNum: parseFloat(finish || 0),
     duration: duration,
+    durationNum: parseFloat(duration || 0),
     takeoff: takeoff,
     landing: landing,
-    total: total,
+    total: parseFloat(total || 0),
     multiplier: multiplier,
-    score: score,
-    maxHeight: maxHeight,
-    lowHeight: lowHeight,
-    takeoffHeight: teakeoffHeight,
-    maxClimb: maxClimb,
-    minClimb: minClimb,
-    maxSpeed: maxSpeed,
-    avgSpeedCourse: avgSpeedCourse,
-    avgSpeedTrack: avgSpeedTrack
+    score: parseFloat(score || 0),
+    maxHeight: parseFloat(maxHeight || 0),
+    lowHeight: parseFloat(lowHeight || 0),
+    takeoffHeight: parseFloat(takeoffHeight || 0),
+    maxClimb: parseFloat(maxClimb || 0),
+    minClimb: parseFloat(minClimb || 0),
+    maxSpeed: parseFloat(maxSpeed || 0),
+    avgSpeedCourse: parseFloat(avgSpeedCourse || 0),
+    avgSpeedTrack: parseFloat(avgSpeedTrack || 0)
   }
 
   self.models.push(model);
 
-  // var nextUrl = $('.navNext a').attr('href');
-  var nextUrl = 'undefined';
+  var nextUrl = $('.navNext a').attr('href');
   if(nextUrl !== 'undefined' && nextUrl !== undefined){
     console.log("nextUrl: ", nextUrl);
     return nextUrl;
