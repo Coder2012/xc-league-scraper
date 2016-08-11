@@ -199,7 +199,7 @@ Scraper.prototype.parseFlightPage = function(html) {
         title: title,
         club: club,
         glider: glider,
-        date: moment(date, 'DD MMM YYYY'),
+        date: moment.utc(date, 'DD MMM YYYY'),
         start: start,
         startNum: parseFloat(start || 0),
         finish: finish,
