@@ -33,6 +33,7 @@ const scrapePilots = () => {
     scraper.events.on('complete', function(models) {
         for (var i = 0; i < models.length; i++) {
             model = new Model(models[i]);
+            // console.log(model)
             model.save(function(err) {
                 if (err) {
                     console.log('Database error saving: ' + url);

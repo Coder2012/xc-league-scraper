@@ -16,7 +16,8 @@ class Scraper {
         this.eventEmitter = new EventEmitter();
         this.index = 0;
         this.url = url;
-        this.urls = [];
+        // this.urls = [];
+        this.urls = ["/xc/flights/20184128.html?vx=01200902", "/xc/flights/20184123.html?vx=01200902", "/xc/flights/20184127.html?vx=01200902", "/xc/flights/20184129.html?vx=01200902", "/xc/flights/20184122.html?vx=01200902", "/xc/flights/20184131.html?vx=01200902", "/xc/flights/20184132.html?vx=01200902", "/xc/flights/20184133.html?vx=01200902", "/xc/flights/20184125.html?vx=01200902", "/xc/flights/20184142.html?vx=01200902", "/xc/flights/20184139.html?vx=01200903", "/xc/flights/20184141.html?vx=01200903", "/xc/flights/20184140.html?vx=01200903", "/xc/flights/20184150.html?vx=01200903", "/xc/flights/20184188.html?vx=01200903", "/xc/flights/20184154.html?vx=01200903", "/xc/flights/20184147.html?vx=01200903", "/xc/flights/20184149.html?vx=01200904", "/xc/flights/20184148.html?vx=01200904", "/xc/flights/20184146.html?vx=01200904", "/xc/flights/20184180.html?vx=01200904", "/xc/flights/20184151.html?vx=01200904", "/xc/flights/20184145.html?vx=01200904", "/xc/flights/20184143.html?vx=01200904", "/xc/flights/20184144.html?vx=01200904", "/xc/flights/20184222.html?vx=01200905", "/xc/flights/20184173.html?vx=01200905", "/xc/flights/20184187.html?vx=01200905", "/xc/flights/20184213.html?vx=01200905", "/xc/flights/20184177.html?vx=01200905", "/xc/flights/20184166.html?vx=01200905", "/xc/flights/20184167.html?vx=01200905", "/xc/flights/20184158.html?vx=01200905", "/xc/flights/20184168.html?vx=01200905", "/xc/flights/20184160.html?vx=01200905", "/xc/flights/20184165.html?vx=01200905", "/xc/flights/20184163.html?vx=01200905", "/xc/flights/20184164.html?vx=01200905", "/xc/flights/20184171.html?vx=01200905", "/xc/flights/20184161.html?vx=01200905", "/xc/flights/20184236.html?vx=01200905", "/xc/flights/20184214.html?vx=01200905", "/xc/flights/20184162.html?vx=01200905", "/xc/flights/20184159.html?vx=01200905", "/xc/flights/20184191.html?vx=01200905", "/xc/flights/20184194.html?vx=01200906", "/xc/flights/20184208.html?vx=01200907", "/xc/flights/20184233.html?vx=01200907", "/xc/flights/20184205.html?vx=01200907", "/xc/flights/20184204.html?vx=01200907", "/xc/flights/20184201.html?vx=01200907", "/xc/flights/20184200.html?vx=01200907", "/xc/flights/20184215.html?vx=01200907", "/xc/flights/20184207.html?vx=01200907", "/xc/flights/20184198.html?vx=01200907", "/xc/flights/20184199.html?vx=01200907", "/xc/flights/20184217.html?vx=01200908", "/xc/flights/20184251.html?vx=01200913", "/xc/flights/20184242.html?vx=01200913", "/xc/flights/20184245.html?vx=01200913", "/xc/flights/20184239.html?vx=01200913", "/xc/flights/20184249.html?vx=01200913", "/xc/flights/20184255.html?vx=01200913", "/xc/flights/20184258.html?vx=01200913", "/xc/flights/20184235.html?vx=01200913", "/xc/flights/20184244.html?vx=01200913", "/xc/flights/20184234.html?vx=01200913", "/xc/flights/20184241.html?vx=01200913", "/xc/flights/20184238.html?vx=01200913", "/xc/flights/20184246.html?vx=01200913", "/xc/flights/20184259.html?vx=01200913", "/xc/flights/20184257.html?vx=01200913", "/xc/flights/20184240.html?vx=01200913", "/xc/flights/20184252.html?vx=01200913", "/xc/flights/20184248.html?vx=01200913", "/xc/flights/20184254.html?vx=01200913"]
         this.init();
     }
     
@@ -24,7 +25,7 @@ class Scraper {
         this.models = [];
     
         this.eventEmitter.on('loadedPilotPage', (html) => {
-            this.urls = this.parseLeaguePage(html);
+            // this.urls = this.parseLeaguePage(html);
             this.url = domain + this.urls[this.index];
             this.loadPage('loadedFlightPage');
         });
@@ -103,7 +104,8 @@ class Scraper {
     
         $('#coordinates').remove();
     
-        var pilot = $('#hpTitle').html().replace(/\n|<span.*<\/span>/gi, "");
+        // var pilot = $('#hpTitle').html().replace(/\n|<span.*<\/span>/gi, "");
+        var pilot = $('.vfPilot').text();
         var title = $('.vfFlightText').text();
     
         var club = '',
@@ -195,7 +197,7 @@ class Scraper {
             title: title,
             club: club,
             glider: glider,
-            date: moment.utc(date, 'DD MMM YYYY'),
+            date: moment.utc(date, 'DD MMM YYYY').toDate(),
             start: start,
             startNum: parseFloat(start || 0),
             finish: finish,
@@ -219,7 +221,8 @@ class Scraper {
     
         this.models.push(model);
     
-        var nextUrl = $('.navNext a').attr('href');
+        // var nextUrl = $('.navNext a').attr('href');
+        var nextUrl = undefined;
         if (nextUrl !== 'undefined' && nextUrl !== undefined) {
             console.log("nextUrl: ", nextUrl);
             return nextUrl;

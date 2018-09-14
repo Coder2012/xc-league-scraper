@@ -3,10 +3,7 @@ import mongoose from 'mongoose';
 const pwd = encodeURIComponent(process.env.MONGODB_ATLAS_PWD);
 
 mongoose.connect(
-	`mongodb://nebrown:${pwd}@paragliding-nodejs-shard-00-00-ocmr9.mongodb.net:27017,
-	paragliding-nodejs-shard-00-01-ocmr9.mongodb.net:27017,
-	paragliding-nodejs-shard-00-02-ocmr9.mongodb.net:27017/
-	test?ssl=true&replicaSet=paragliding-nodejs-shard-0&authSource=admin&retryWrites=true`
+	`mongodb://nebrown:${pwd}@paragliding-nodejs-shard-00-00-ocmr9.mongodb.net:27017,paragliding-nodejs-shard-00-01-ocmr9.mongodb.net:27017,paragliding-nodejs-shard-00-02-ocmr9.mongodb.net:27017/test?ssl=true&replicaSet=paragliding-nodejs-shard-0&authSource=admin&retryWrites=true`
 );
 
 mongoose.connection.on('error', function(err) {
