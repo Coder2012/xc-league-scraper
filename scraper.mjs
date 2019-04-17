@@ -3,6 +3,39 @@ import cheerio from 'cheerio';
 import moment from 'moment';
     // util = require('util'),
 import EventEmitter from 'events';
+import flightUrls2005 from './flights-2005.mjs';
+import flightUrls2006 from './flights-2006.mjs';
+import flightUrls2007 from './flights-2007.mjs';
+import flightUrls2008 from './flights-2008.mjs';
+import flightUrls2009 from './flights-2009.mjs';
+import flightUrls2010 from './flights-2010.mjs';
+import flightUrls2011 from './flights-2011.mjs';
+import flightUrls2012 from './flights-2012.mjs';
+import flightUrls2013 from './flights-2013.mjs';
+import flightUrls2014 from './flights-2014.mjs';
+import flightUrls2015 from './flights-2015.mjs';
+import flightUrls2016 from './flights-2016.mjs';
+import flightUrls2017 from './flights-2017.mjs';
+import flightUrls2018 from './flights-2018.mjs';
+import flightUrls2019 from './flights-2019.mjs';
+
+const flightUrls = [
+    ...flightUrls2005,
+    ...flightUrls2006,
+    ...flightUrls2007,
+    ...flightUrls2008,
+    ...flightUrls2009,
+    ...flightUrls2010,
+    ...flightUrls2011,
+    ...flightUrls2012,
+    ...flightUrls2013,
+    ...flightUrls2014,
+    ...flightUrls2015,
+    ...flightUrls2016,
+    ...flightUrls2017,
+    ...flightUrls2018,
+    ...flightUrls2019
+]
 
 const STATUS_CODES = http.STATUS_CODES,
     domain = 'http://www.xcleague.com',
@@ -16,8 +49,7 @@ class Scraper {
         this.eventEmitter = new EventEmitter();
         this.index = 0;
         this.url = url;
-        // this.urls = [];
-        this.urls = ["/xc/flights/20184128.html?vx=01200902", "/xc/flights/20184123.html?vx=01200902", "/xc/flights/20184127.html?vx=01200902", "/xc/flights/20184129.html?vx=01200902", "/xc/flights/20184122.html?vx=01200902", "/xc/flights/20184131.html?vx=01200902", "/xc/flights/20184132.html?vx=01200902", "/xc/flights/20184133.html?vx=01200902", "/xc/flights/20184125.html?vx=01200902", "/xc/flights/20184142.html?vx=01200902", "/xc/flights/20184139.html?vx=01200903", "/xc/flights/20184141.html?vx=01200903", "/xc/flights/20184140.html?vx=01200903", "/xc/flights/20184150.html?vx=01200903", "/xc/flights/20184188.html?vx=01200903", "/xc/flights/20184154.html?vx=01200903", "/xc/flights/20184147.html?vx=01200903", "/xc/flights/20184149.html?vx=01200904", "/xc/flights/20184148.html?vx=01200904", "/xc/flights/20184146.html?vx=01200904", "/xc/flights/20184180.html?vx=01200904", "/xc/flights/20184151.html?vx=01200904", "/xc/flights/20184145.html?vx=01200904", "/xc/flights/20184143.html?vx=01200904", "/xc/flights/20184144.html?vx=01200904", "/xc/flights/20184222.html?vx=01200905", "/xc/flights/20184173.html?vx=01200905", "/xc/flights/20184187.html?vx=01200905", "/xc/flights/20184213.html?vx=01200905", "/xc/flights/20184177.html?vx=01200905", "/xc/flights/20184166.html?vx=01200905", "/xc/flights/20184167.html?vx=01200905", "/xc/flights/20184158.html?vx=01200905", "/xc/flights/20184168.html?vx=01200905", "/xc/flights/20184160.html?vx=01200905", "/xc/flights/20184165.html?vx=01200905", "/xc/flights/20184163.html?vx=01200905", "/xc/flights/20184164.html?vx=01200905", "/xc/flights/20184171.html?vx=01200905", "/xc/flights/20184161.html?vx=01200905", "/xc/flights/20184236.html?vx=01200905", "/xc/flights/20184214.html?vx=01200905", "/xc/flights/20184162.html?vx=01200905", "/xc/flights/20184159.html?vx=01200905", "/xc/flights/20184191.html?vx=01200905", "/xc/flights/20184194.html?vx=01200906", "/xc/flights/20184208.html?vx=01200907", "/xc/flights/20184233.html?vx=01200907", "/xc/flights/20184205.html?vx=01200907", "/xc/flights/20184204.html?vx=01200907", "/xc/flights/20184201.html?vx=01200907", "/xc/flights/20184200.html?vx=01200907", "/xc/flights/20184215.html?vx=01200907", "/xc/flights/20184207.html?vx=01200907", "/xc/flights/20184198.html?vx=01200907", "/xc/flights/20184199.html?vx=01200907", "/xc/flights/20184217.html?vx=01200908", "/xc/flights/20184251.html?vx=01200913", "/xc/flights/20184242.html?vx=01200913", "/xc/flights/20184245.html?vx=01200913", "/xc/flights/20184239.html?vx=01200913", "/xc/flights/20184249.html?vx=01200913", "/xc/flights/20184255.html?vx=01200913", "/xc/flights/20184258.html?vx=01200913", "/xc/flights/20184235.html?vx=01200913", "/xc/flights/20184244.html?vx=01200913", "/xc/flights/20184234.html?vx=01200913", "/xc/flights/20184241.html?vx=01200913", "/xc/flights/20184238.html?vx=01200913", "/xc/flights/20184246.html?vx=01200913", "/xc/flights/20184259.html?vx=01200913", "/xc/flights/20184257.html?vx=01200913", "/xc/flights/20184240.html?vx=01200913", "/xc/flights/20184252.html?vx=01200913", "/xc/flights/20184248.html?vx=01200913", "/xc/flights/20184254.html?vx=01200913"]
+        this.urls = flightUrls;
         this.init();
     }
     
@@ -26,7 +58,7 @@ class Scraper {
     
         this.eventEmitter.on('loadedPilotPage', (html) => {
             // this.urls = this.parseLeaguePage(html);
-            this.url = domain + this.urls[this.index];
+            this.url = this.urls[this.index];
             this.loadPage('loadedFlightPage');
         });
     
@@ -34,12 +66,12 @@ class Scraper {
             var nextUrl = this.parseFlightPage(html);
             if (nextUrl !== undefined && nextUrl !== 'undefined') {
                 console.log("loadedFlightPage: ", nextUrl);
-                this.url = domain + nextUrl;
+                this.url = nextUrl;
                 this.loadPage('loadedFlightPage');
             } else {
                 if (this.index < this.urls.length - 1) {
                     this.index++;
-                    this.url = domain + this.urls[this.index];
+                    this.url = this.urls[this.index];
                     this.loadPage('loadedFlightPage');
                 } else {
                     this.eventEmitter.emit('complete', this.models);
@@ -216,7 +248,8 @@ class Scraper {
             minClimb: parseFloat(minClimb || 0),
             maxSpeed: parseFloat(maxSpeed || 0),
             avgSpeedCourse: parseFloat(avgSpeedCourse || 0),
-            avgSpeedTrack: parseFloat(avgSpeedTrack || 0)
+            avgSpeedTrack: parseFloat(avgSpeedTrack || 0),
+            link: this.url
         }
     
         this.models.push(model);

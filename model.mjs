@@ -3,7 +3,8 @@ import mongoose from 'mongoose';
 const pwd = encodeURIComponent(process.env.MONGODB_ATLAS_PWD);
 
 mongoose.connect(
-	`mongodb://nebrown:${pwd}@paragliding-nodejs-shard-00-00-ocmr9.mongodb.net:27017,paragliding-nodejs-shard-00-01-ocmr9.mongodb.net:27017,paragliding-nodejs-shard-00-02-ocmr9.mongodb.net:27017/test?ssl=true&replicaSet=paragliding-nodejs-shard-0&authSource=admin&retryWrites=true`
+	`mongodb://localhost:27017`
+	// `mongodb://nebrown:${pwd}@paragliding-nodejs-shard-00-00-ocmr9.mongodb.net:27017,paragliding-nodejs-shard-00-01-ocmr9.mongodb.net:27017,paragliding-nodejs-shard-00-02-ocmr9.mongodb.net:27017/test?ssl=true&replicaSet=paragliding-nodejs-shard-0&authSource=admin&retryWrites=true`
 );
 
 mongoose.connection.on('error', function(err) {
@@ -35,7 +36,8 @@ const FlightSchema = new mongoose.Schema({
 	minClimb: Number,
 	maxSpeed: Number,
 	avgSpeedCourse: Number,
-	avgSpeedTrack: Number
+	avgSpeedTrack: Number,
+	link:String
 });
 
 export default mongoose.model('flights', FlightSchema);

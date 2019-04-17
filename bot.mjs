@@ -8,7 +8,7 @@ let pages = [];
 const generateUrls = () => {
     // test url for errors
     //http://www.xcleague.com/xc/flights/20142100.html?vx=0111
-    let url = domain + '/xc/leagues/all-1.html';
+    let url = domain + '/xc/leagues/2008-1.html';
     let urls = [url];
     return urls;
 }
@@ -31,15 +31,31 @@ const scrapePilots = () => {
     });
 
     scraper.events.on('complete', function(models) {
-        for (var i = 0; i < models.length; i++) {
-            model = new Model(models[i]);
-            // console.log(model)
-            model.save(function(err) {
-                if (err) {
-                    console.log('Database error saving: ' + url);
-                }
-            });
-        };
+        // for (var i = 0; i < models.length; i++) {
+        //     setTimeout((m) => {
+        //         var model = new Model(m);
+        //         console.log(model)
+        //         model.save(function(err) {
+        //             if (err) {
+        //                 console.log('Database error saving: ' + url);
+        //             }
+        //         });
+        //     }, 50, models[i]);
+        // }
+        // var Potato = mongoose.model('Potato', PotatoSchema);
+
+        // var potatoBag = [/* a humongous amount of potato objects */];
+
+        Model.collection.insert(models, onInsert);
+
+        function onInsert(err) {
+            if (err) {
+                // TODO: handle error
+                console.log('Error inserting docs')
+            } else {
+                console.info('flights were successfully stored');
+            }
+        }
         console.log("All models successfully saved to MongoDB");
     });
 }
