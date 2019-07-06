@@ -20,20 +20,20 @@ import flightUrls2018 from './flights-2018.mjs';
 import flightUrls2019 from './flights-2019.mjs';
 
 const flightUrls = [
-    ...flightUrls2005,
-    ...flightUrls2006,
-    ...flightUrls2007,
-    ...flightUrls2008,
-    ...flightUrls2009,
-    ...flightUrls2010,
-    ...flightUrls2011,
-    ...flightUrls2012,
-    ...flightUrls2013,
-    ...flightUrls2014,
-    ...flightUrls2015,
-    ...flightUrls2016,
-    ...flightUrls2017,
-    ...flightUrls2018,
+    // ...flightUrls2005,
+    // ...flightUrls2006,
+    // ...flightUrls2007,
+    // ...flightUrls2008,
+    // ...flightUrls2009,
+    // ...flightUrls2010,
+    // ...flightUrls2011,
+    // ...flightUrls2012,
+    // ...flightUrls2013,
+    // ...flightUrls2014,
+    // ...flightUrls2015,
+    // ...flightUrls2016,
+    // ...flightUrls2017,
+    // ...flightUrls2018,
     ...flightUrls2019
 ]
 
@@ -65,7 +65,6 @@ class Scraper {
         this.eventEmitter.on('loadedFlightPage', (html) => {
             var nextUrl = this.parseFlightPage(html);
             if (nextUrl !== undefined && nextUrl !== 'undefined') {
-                console.log("loadedFlightPage: ", nextUrl);
                 this.url = nextUrl;
                 this.loadPage('loadedFlightPage');
             } else {
@@ -88,7 +87,7 @@ class Scraper {
     
     loadPage(eventName) {
         id = this.url.match(regex)[0];
-        console.log('\n\nLoading: ', this.url);
+        // console.log('\n\nLoading: ', this.url);
         console.log("id: ", id);
         
         http.get(this.url, (res) => {
@@ -104,6 +103,7 @@ class Scraper {
             });
         })
         .on('error', (err) => {
+            console.log('error url:', this.url);
             this.eventEmitter.emit('error', err);
         });
     };
@@ -255,13 +255,13 @@ class Scraper {
         this.models.push(model);
     
         // var nextUrl = $('.navNext a').attr('href');
-        var nextUrl = undefined;
-        if (nextUrl !== 'undefined' && nextUrl !== undefined) {
-            console.log("nextUrl: ", nextUrl);
-            return nextUrl;
-        } else {
-            console.log("no more urls");
-        }
+        // var nextUrl = undefined;
+        // if (nextUrl !== 'undefined' && nextUrl !== undefined) {
+        //     console.log("nextUrl: ", nextUrl);
+        //     return nextUrl;
+        // } else {
+        //     console.log("no more urls");
+        // }
     }
 
     get events() {
