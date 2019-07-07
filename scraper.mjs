@@ -18,6 +18,7 @@ import flightUrls2016 from './flights-2016.mjs';
 import flightUrls2017 from './flights-2017.mjs';
 import flightUrls2018 from './flights-2018.mjs';
 import flightUrls2019 from './flights-2019.mjs';
+import flightsLatest from './flights-latest.mjs';
 
 const flightUrls = [
     // ...flightUrls2005,
@@ -34,7 +35,8 @@ const flightUrls = [
     // ...flightUrls2016,
     // ...flightUrls2017,
     // ...flightUrls2018,
-    ...flightUrls2019
+    // ...flightUrls2019,
+    ...flightsLatest,
 ]
 
 const STATUS_CODES = http.STATUS_CODES,
